@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WellBot — Your AI Wellness Companion</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --mint: #00e5a0;
+    --teal: #00b4d8;
+    --indigo: #4f46e5;
+    --bg: #080c14;
+    --card: #0d1520;
+    --card2: #111b2b;
+    --text: #e8f4f8;
+    --muted: #6b8a9e;
+    --border: rgba(0,229,160,0.15);
+    --glow: 0 0 40px rgba(0,229,160,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NAVBAR ─────────────────────────────────────────────────────────── */
+  .navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 60px;
+    height: 68px;
+    background: rgba(8,12,20,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.3s;
+  }
+
+  .navbar.scrolled {
+    border-bottom-color: var(--border);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--mint), var(--teal));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 0 24px rgba(0,229,160,0.35);
+  }
+
+  .logo-text {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--mint), var(--teal));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .btn-nav-login {
+    padding: 9px 20px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--mint);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-nav-login:hover { background: rgba(0,229,160,0.07); }
+
+  .btn-nav-signup {
+    padding: 9px 20px;
+    background: linear-gradient(135deg, var(--mint), var(--teal));
+    border: none;
+    border-radius: 8px;
+    color: #080c14;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-nav-signup:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,229,160,0.3); }
+
+  .hamburger-nav {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 6px;
+  }
+  .hamburger-nav span { width: 22px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s; }
+
+  /* ── HERO ─────────────────────────────────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 100px 60px 80px;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 10% 50%, rgba(0,229,160,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 70% at 90% 20%, rgba(0,180,216,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 50% 80%, rgba(79,70,229,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    animation: float 10s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .orb-1 { width: 500px; height: 500px; background: rgba(0,229,160,0.06); top: -100px; right: -100px; }
+  .orb-2 { width: 350px; height: 350px; background: rgba(79,70,229,0.1); bottom: -50px; left: -80px; animation-delay: -4s; }
+  .orb-3 { width: 250px; height: 250px; background: rgba(0,180,216,0.08); top: 30%; right: 25%; animation-delay: -7s; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-30px) scale(1.04); }
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .hero-left {}
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    background: rgba(0,229,160,0.08);
+    border: 1px solid rgba(0,229,160,0.25);
+    border-radius: 100px;
+    font-size: 13px;
+    color: var(--mint);
+    font-weight: 500;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .badge-dot {
+    width: 7px; height: 7px;
+    background: var(--mint);
+    border-radius: 50%;
+    animation: pulse-dot 2s ease infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .hero-headline {
+    font-family: 'Clash Display', sans-serif;
+    font-size: clamp(40px, 4.5vw, 68px);
+    font-weight: 700;
+    line-height: 1.05;
+    margin-bottom: 22px;
+    background: linear-gradient(160deg, #ffffff 30%, var(--mint) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+
+  .hero-sub {
+    font-size: 18px;
+    color: var(--muted);
+    line-height: 1.75;
+    max-width: 500px;
+    margin-bottom: 40px;
+    font-weight: 300;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 52px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+
+  .btn-hero-primary {
+    padding: 15px 32px;
+    background: linear-gradient(135deg, var(--mint), var(--teal));
+    border: none;
+    border-radius: 12px;
+    color: #080c14;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s;
+    box-shadow: 0 4px 24px rgba(0,229,160,0.25);
+  }
+  .btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 36px rgba(0,229,160,0.4); }
+
+  .btn-hero-secondary {
+    padding: 15px 28px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s;
+  }
+  .btn-hero-secondary:hover { background: rgba(255,255,255,0.04); border-color: rgba(0,229,160,0.4); }
+
+  .hero-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    animation: fadeUp 0.6s ease 0.4s both;
+  }
+
+  .pill {
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-size: 13px;
+    color: var(--mint);
+    background: rgba(0,229,160,0.04);
+    backdrop-filter: blur(10px);
+    transition: all 0.2s;
+  }
+  .pill:hover { background: rgba(0,229,160,0.1); }
+
+  /* Hero right — dashboard preview card */
+  .hero-right {
+    position: relative;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .preview-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,229,160,0.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .preview-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--mint), var(--teal), var(--indigo));
+  }
+
+  .preview-topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .pd-red { background: #f43f5e; }
+  .pd-amber { background: #f59e0b; }
+  .pd-green { background: var(--mint); }
+
+  .preview-title {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .preview-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .preview-stat {
+    background: var(--card2);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .ps-icon { font-size: 18px; margin-bottom: 4px; }
+  .ps-val { font-family: 'Clash Display', sans-serif; font-size: 20px; font-weight: 700; color: var(--mint); }
+  .ps-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  .preview-chart-wrap {
+    background: var(--card2);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+
+  .preview-chart-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+
+  .preview-ai-bar {
+    background: var(--card2);
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ai-bar-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, rgba(0,229,160,0.2), rgba(99,102,241,0.2));
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .ai-bar-text { flex: 1; }
+  .ai-bar-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+  .ai-bar-sub { font-size: 11px; color: var(--muted); }
+
+  .ai-bar-badge {
+    font-size: 11px;
+    background: rgba(0,229,160,0.1);
+    border: 1px solid rgba(0,229,160,0.25);
+    color: var(--mint);
+    padding: 4px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  /* Floating accent cards */
+  .float-card {
+    position: absolute;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    animation: float 8s ease-in-out infinite;
+    z-index: 3;
+  }
+
+  .fc-top {
+    top: -20px; right: -30px;
+    animation-delay: -2s;
+  }
+
+  .fc-bottom {
+    bottom: -20px; left: -30px;
+    animation-delay: -5s;
+  }
+
+  .fc-icon { font-size: 22px; }
+  .fc-label { font-size: 11px; color: var(--muted); }
+  .fc-val { font-family: 'Clash Display', sans-serif; font-size: 15px; font-weight: 700; color: var(--mint); }
+
+  /* ── STATS BANNER ─────────────────────────────────────────────────── */
+  .stats-banner {
+    background: var(--card);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 40px 60px;
+  }
+
+  .stats-banner-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 40px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--mint), var(--teal));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .stat-desc { font-size: 14px; color: var(--muted); }
+
+  .stat-divider {
+    width: 1px; height: 48px;
+    background: rgba(255,255,255,0.07);
+  }
+
+  /* ── FEATURES ─────────────────────────────────────────────────────── */
+  .section {
+    padding: 100px 60px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .section-tag {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--mint);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: 'Clash Display', sans-serif;
+    font-size: clamp(30px, 3.5vw, 48px);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    background: linear-gradient(160deg, #fff 40%, var(--mint) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .section-sub {
+    font-size: 17px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 560px;
+    font-weight: 300;
+    margin-bottom: 60px;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .feature-card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 18px;
+    padding: 28px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+  }
+
+  .feature-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    border: 1px solid transparent;
+    background: linear-gradient(135deg, rgba(0,229,160,0.15), rgba(0,180,216,0.1)) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .feature-card:hover { transform: translateY(-4px); border-color: rgba(0,229,160,0.2); }
+  .feature-card:hover::after { opacity: 1; }
+
+  .fc-emoji {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    margin-bottom: 18px;
+  }
+
+  .fc-em-mint { background: rgba(0,229,160,0.1); }
+  .fc-em-teal { background: rgba(0,180,216,0.1); }
+  .fc-em-indigo { background: rgba(79,70,229,0.1); }
+  .fc-em-rose { background: rgba(244,63,94,0.1); }
+  .fc-em-amber { background: rgba(245,158,11,0.1); }
+  .fc-em-green { background: rgba(34,197,94,0.1); }
+
+  .feature-card h3 {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .feature-card p { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+  .feature-tag {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--mint);
+    background: rgba(0,229,160,0.08);
+    border: 1px solid rgba(0,229,160,0.2);
+    border-radius: 100px;
+    padding: 3px 10px;
+    font-weight: 500;
+  }
+
+  /* ── AI SECTION ───────────────────────────────────────────────────── */
+  .ai-section {
+    padding: 0 60px 100px;
+  }
+
+  .ai-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .ai-inner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--mint), var(--teal), var(--indigo));
+  }
+
+  .ai-glow {
+    position: absolute;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(0,229,160,0.08) 0%, transparent 70%);
+    top: -50px; left: -50px;
+    pointer-events: none;
+  }
+
+  .ai-left { position: relative; z-index: 1; }
+
+  .ai-model-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .model-card {
+    background: var(--card2);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.2s;
+  }
+
+  .model-card:hover { border-color: rgba(0,229,160,0.25); }
+
+  .model-card-full { grid-column: 1 / -1; }
+
+  .mc-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .mc-value { font-family: 'Clash Display', sans-serif; font-size: 18px; font-weight: 600; color: var(--mint); }
+
+  .progress-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--mint), var(--teal));
+    transition: width 1.5s ease;
+  }
+
+  .ai-right { position: relative; z-index: 1; }
+
+  /* ── HOW IT WORKS ─────────────────────────────────────────────────── */
+  .how-section {
+    padding: 0 60px 100px;
+  }
+
+  .how-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    position: relative;
+  }
+
+  .steps-grid::before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), var(--border), transparent);
+    z-index: 0;
+  }
+
+  .step-card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s;
+  }
+
+  .step-card:hover { transform: translateY(-4px); border-color: rgba(0,229,160,0.2); }
+
+  .step-num {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, var(--mint), var(--teal));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Clash Display', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #080c14;
+    margin: 0 auto 16px;
+  }
+
+  .step-card h3 { font-family: 'Clash Display', sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+  .step-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* ── SPECIALISTS ──────────────────────────────────────────────────── */
+  .specialists-section {
+    padding: 0 60px 100px;
+  }
+
+  .specialists-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .specialists-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .specialist-card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.25s;
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .specialist-card:hover { transform: translateY(-3px); border-color: rgba(0,229,160,0.25); background: rgba(0,229,160,0.03); }
+
+  .spec-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+
+  .spec-text {}
+  .spec-name { font-family: 'Clash Display', sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .spec-desc { font-size: 13px; color: var(--muted); }
+  .spec-arrow { margin-left: auto; font-size: 18px; color: var(--muted); transition: transform 0.2s; }
+  .specialist-card:hover .spec-arrow { transform: translateX(4px); color: var(--mint); }
+
+  /* ── TESTIMONIALS ─────────────────────────────────────────────────── */
+  .testimonials-section {
+    padding: 0 60px 100px;
+  }
+
+  .testimonials-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .testimonial-card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.3s;
+  }
+
+  .testimonial-card:hover { transform: translateY(-3px); border-color: rgba(0,229,160,0.2); }
+
+  .tc-stars { color: #f59e0b; font-size: 15px; margin-bottom: 14px; letter-spacing: 2px; }
+
+  .tc-quote {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    font-style: italic;
+    font-weight: 300;
+    position: relative;
+    padding-left: 16px;
+  }
+
+  .tc-quote::before {
+    content: '"';
+    position: absolute;
+    left: 0; top: -4px;
+    font-family: 'Clash Display', sans-serif;
+    font-size: 36px;
+    color: var(--mint);
+    opacity: 0.4;
+    line-height: 1;
+  }
+
+  .tc-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .tc-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #080c14;
+    flex-shrink: 0;
+  }
+
+  .tc-name { font-size: 14px; font-weight: 600; }
+  .tc-role { font-size: 12px; color: var(--muted); }
+
+  /* ── CTA SECTION ──────────────────────────────────────────────────── */
+  .cta-section {
+    padding: 0 60px 100px;
+  }
+
+  .cta-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-inner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--mint), var(--teal), var(--indigo));
+  }
+
+  .cta-glow {
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,229,160,0.07) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .cta-inner h2 {
+    font-family: 'Clash Display', sans-serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 700;
+    margin-bottom: 16px;
+    background: linear-gradient(160deg, #fff 40%, var(--mint) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-inner p {
+    font-size: 18px;
+    color: var(--muted);
+    margin-bottom: 40px;
+    font-weight: 300;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── FOOTER ───────────────────────────────────────────────────────── */
+  .footer {
+    background: var(--card);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 40px 60px;
+  }
+
+  .footer-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .footer-left { display: flex; align-items: center; gap: 12px; }
+  .footer-copy { font-size: 13px; color: var(--muted); }
+
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--mint); }
+
+  /* ── ANIMATIONS ───────────────────────────────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── RESPONSIVE ───────────────────────────────────────────────────── */
+  @media (max-width: 1100px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 60px; }
+    .hero-right { display: none; }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+    .specialists-grid { grid-template-columns: 1fr 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr 1fr; }
+    .steps-grid { grid-template-columns: 1fr 1fr; }
+    .steps-grid::before { display: none; }
+    .ai-inner { grid-template-columns: 1fr; }
+    .ai-left { order: 2; }
+  }
+
+  @media (max-width: 768px) {
+    .navbar { padding: 0 20px; }
+    .nav-links { display: none; }
+    .nav-cta .btn-nav-login { display: none; }
+    .hamburger-nav { display: flex; }
+    .hero { padding: 100px 20px 60px; }
+    .stats-banner { padding: 40px 20px; }
+    .stats-banner-inner { gap: 20px; }
+    .stat-divider { display: none; }
+    .section { padding: 60px 20px; }
+    .ai-section { padding: 0 20px 60px; }
+    .ai-inner { padding: 32px 20px; gap: 32px; }
+    .how-section { padding: 0 20px 60px; }
+    .specialists-section { padding: 0 20px 60px; }
+    .testimonials-section { padding: 0 20px 60px; }
+    .cta-section { padding: 0 20px 60px; }
+    .cta-inner { padding: 40px 24px; }
+    .footer { padding: 32px 20px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .specialists-grid { grid-template-columns: 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .steps-grid { grid-template-columns: 1fr 1fr; }
+    .ai-model-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-actions { flex-direction: column; }
+    .btn-hero-primary, .btn-hero-secondary { width: 100%; justify-content: center; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .hero-headline { font-size: 36px; }
+    .footer-inner { flex-direction: column; text-align: center; }
+    .footer-links { justify-content: center; }
+  }
+
+  /* Mobile nav menu */
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(8,12,20,0.98);
+    z-index: 200;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a { font-family: 'Clash Display', sans-serif; font-size: 28px; font-weight: 600; color: var(--text); text-decoration: none; transition: color 0.2s; }
+  .mobile-menu a:hover { color: var(--mint); }
+  .mobile-menu-close { position: absolute; top: 24px; right: 24px; font-size: 32px; cursor: pointer; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <span class="mobile-menu-close" onclick="closeMobileMenu()">✕</span>
+  <a href="#features" onclick="closeMobileMenu()">Features</a>
+  <a href="#ai" onclick="closeMobileMenu()">AI Engine</a>
+  <a href="#specialists" onclick="closeMobileMenu()">Specialists</a>
+  <a href="#how" onclick="closeMobileMenu()">How It Works</a>
+  <a href="/login" class="btn-hero-primary" style="font-size:16px">Get Started Free →</a>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <a href="/" class="nav-logo">
+    <div class="logo-icon">🌿</div>
+    <span class="logo-text">WellBot</span>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#ai">AI Engine</a></li>
+    <li><a href="#specialists">Specialists</a></li>
+    <li><a href="#how">How It Works</a></li>
+  </ul>
+
+  <div class="nav-cta">
+    <a href="/login" class="btn-nav-login">Sign In</a>
+    <a href="/login" class="btn-nav-signup">Get Started →</a>
+    <div class="hamburger-nav" onclick="openMobileMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-badge">
+        <div class="badge-dot"></div>
+        AI-Powered Wellness Platform
+      </div>
+
+      <h1 class="hero-headline">Your AI Wellness<br>Partner, Always<br>By Your Side</h1>
+
+      <p class="hero-sub">
+        Expert guidance for mental health, fitness, nutrition, motivation, and stress — powered by advanced AI and real machine learning, available 24/7 in your language.
+      </p>
+
+      <div class="hero-actions">
+        <a href="/login" class="btn-hero-primary">🌿 Start for Free →</a>
+        <a href="#features" class="btn-hero-secondary">✨ See Features</a>
+      </div>
+
+      <div class="hero-pills">
+        <span class="pill">🧠 Mental Health</span>
+        <span class="pill">💪 Fitness Coach</span>
+        <span class="pill">🥗 Nutrition</span>
+        <span class="pill">🔥 Motivation</span>
+        <span class="pill">🌿 Stress Relief</span>
+        <span class="pill">🤖 ML Predictions</span>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <!-- Floating accent cards -->
+      <div class="float-card fc-top">
+        <span class="fc-icon">🤖</span>
+        <div>
+          <div class="fc-val">Happy 😊</div>
+          <div class="fc-label">AI Mood Prediction</div>
+        </div>
+      </div>
+      <div class="float-card fc-bottom">
+        <span class="fc-icon">📊</span>
+        <div>
+          <div class="fc-val">87 / 100</div>
+          <div class="fc-label">Productivity Score</div>
+        </div>
+      </div>
+
+      <!-- Dashboard preview -->
+      <div class="preview-card">
+        <div class="preview-topbar">
+          <div class="preview-dot pd-red"></div>
+          <div class="preview-dot pd-amber"></div>
+          <div class="preview-dot pd-green"></div>
+          <div class="preview-title">WellBot Dashboard</div>
+        </div>
+
+        <div class="preview-stats">
+          <div class="preview-stat">
+            <div class="ps-icon">💬</div>
+            <div class="ps-val">42</div>
+            <div class="ps-lbl">Chats</div>
+          </div>
+          <div class="preview-stat">
+            <div class="ps-icon">🔥</div>
+            <div class="ps-val">7</div>
+            <div class="ps-lbl">Streak</div>
+          </div>
+          <div class="preview-stat">
+            <div class="ps-icon">⭐</div>
+            <div class="ps-val">4.8</div>
+            <div class="ps-lbl">Rating</div>
+          </div>
+        </div>
+
+        <div class="preview-chart-wrap">
+          <div class="preview-chart-label">Weekly Activity</div>
+          <canvas id="previewChart" height="70"></canvas>
+        </div>
+
+        <div class="preview-ai-bar">
+          <div class="ai-bar-icon">🔮</div>
+          <div class="ai-bar-text">
+            <div class="ai-bar-title">AI Wellness Predictor</div>
+            <div class="ai-bar-sub">Stress: Low · Productivity: 87</div>
+          </div>
+          <span class="ai-bar-badge">✨ ML</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BANNER -->
+<div class="stats-banner">
+  <div class="stats-banner-inner">
+    <div class="stat-item reveal">
+      <span class="stat-num" data-target="10000">0</span>
+      <div class="stat-desc">Active Users</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item reveal">
+      <span class="stat-num" data-target="6">0</span>
+      <div class="stat-desc">AI Specialists</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item reveal">
+      <span class="stat-num" data-target="14">0</span>
+      <div class="stat-desc">Languages Supported</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item reveal">
+      <span class="stat-num" data-target="3">0</span>
+      <div class="stat-desc">ML Models Trained</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item reveal">
+      <span class="stat-num" data-target="99">0</span>
+      <div class="stat-desc">% Uptime</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section">
+    <div class="reveal">
+      <span class="section-tag">✦ Features</span>
+      <h2 class="section-title">Everything You Need<br>to Thrive</h2>
+      <p class="section-sub">A complete wellness ecosystem — from AI chat companions to real machine learning predictions based on your daily habits.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="fc-emoji fc-em-mint">🤖</div>
+        <h3>AI Chat Companions</h3>
+        <p>Six specialised AI personas — each trained on a different wellness domain — for deeply personalised conversations.</p>
+        <span class="feature-tag">GPT-4o Powered</span>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="fc-emoji fc-em-indigo">🔮</div>
+        <h3>ML Wellness Predictor</h3>
+        <p>Enter your daily stats and our trained RandomForest models predict your mood, stress level, and productivity score instantly.</p>
+        <span class="feature-tag">scikit-learn ML</span>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="fc-emoji fc-em-teal">📊</div>
+        <h3>Smart Dashboard</h3>
+        <p>Interactive charts track your weekly activity, mood trends, workout streaks, and nutrition — all in one beautiful view.</p>
+        <span class="feature-tag">Real-time Analytics</span>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="fc-emoji fc-em-rose">🌍</div>
+        <h3>14 Languages</h3>
+        <p>Chat in English, Hindi, Telugu, Gujarati, Tamil, Spanish, French, Japanese, and many more — WellBot speaks your language.</p>
+        <span class="feature-tag">Multilingual</span>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="fc-emoji fc-em-amber">🔥</div>
+        <h3>Workout Tracker</h3>
+        <p>Log workouts, track calories burned, and maintain your streak. A visual fire-streak keeps you motivated every day.</p>
+        <span class="feature-tag">Streak System</span>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="fc-emoji fc-em-green">💡</div>
+        <h3>Personalised Tips</h3>
+        <p>AI-generated wellness tips tailored to your prediction results — actionable advice, not generic health advice.</p>
+        <span class="feature-tag">Context-Aware</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI ENGINE SECTION -->
+<section class="ai-section" id="ai">
+  <div class="ai-inner">
+    <div class="ai-glow"></div>
+
+    <div class="ai-left reveal">
+      <span class="section-tag">✦ AI Engine</span>
+      <h2 class="section-title" style="font-size:clamp(26px,3vw,40px)">Real Machine<br>Learning Under the Hood</h2>
+      <p style="font-size:15px;color:var(--muted);line-height:1.75;margin-bottom:28px;font-weight:300;">
+        WellBot doesn't just use pre-built AI — it trains custom RandomForest models on a curated wellness dataset. Every prediction is backed by real scikit-learn ML models, giving you accurate, explainable insights.
+      </p>
+
+      <div class="ai-model-grid">
+        <div class="model-card">
+          <div class="mc-label">Mood Model</div>
+          <div class="mc-value">100% Accuracy</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+        </div>
+        <div class="model-card">
+          <div class="mc-label">Stress Model</div>
+          <div class="mc-value">100% Accuracy</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+        </div>
+        <div class="model-card model-card-full">
+          <div class="mc-label">Productivity Score (R²)</div>
+          <div class="mc-value">0.993 Score</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:99.3%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-right reveal">
+      <div style="background:var(--card2);border-radius:14px;padding:24px;">
+        <div style="font-family:'Clash Display',sans-serif;font-size:14px;font-weight:600;margin-bottom:16px;color:var(--muted)">Input → Prediction Flow</div>
+
+        <div style="display:grid;gap:10px;">
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;">
+            <span style="font-size:20px">😴</span>
+            <div style="flex:1">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:3px">Sleep Hours</div>
+              <div style="font-size:14px;font-weight:600">7.5 hrs</div>
+            </div>
+            <div style="font-size:11px;color:var(--mint);background:rgba(0,229,160,0.1);padding:3px 8px;border-radius:100px">Input</div>
+          </div>
+
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;">
+            <span style="font-size:20px">💼</span>
+            <div style="flex:1">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:3px">Work Hours</div>
+              <div style="font-size:14px;font-weight:600">8 hrs</div>
+            </div>
+            <div style="font-size:11px;color:var(--mint);background:rgba(0,229,160,0.1);padding:3px 8px;border-radius:100px">Input</div>
+          </div>
+
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;">
+            <span style="font-size:20px">🏃</span>
+            <div style="flex:1">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:3px">Exercise</div>
+              <div style="font-size:14px;font-weight:600">30 mins</div>
+            </div>
+            <div style="font-size:11px;color:var(--mint);background:rgba(0,229,160,0.1);padding:3px 8px;border-radius:100px">Input</div>
+          </div>
+
+          <div style="text-align:center;color:var(--muted);font-size:22px;padding:4px">↓</div>
+
+          <div style="background:linear-gradient(135deg,rgba(0,229,160,0.1),rgba(99,102,241,0.1));border:1px solid rgba(0,229,160,0.25);border-radius:10px;padding:16px;">
+            <div style="font-size:11px;color:var(--mint);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">RandomForest ML Output</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+              <div style="text-align:center">
+                <div style="font-size:22px">😊</div>
+                <div style="font-family:'Clash Display',sans-serif;font-size:14px;font-weight:700;color:var(--mint)">Happy</div>
+                <div style="font-size:10px;color:var(--muted)">Mood</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:22px">✅</div>
+                <div style="font-family:'Clash Display',sans-serif;font-size:14px;font-weight:700;color:var(--mint)">Low</div>
+                <div style="font-size:10px;color:var(--muted)">Stress</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:22px">📈</div>
+                <div style="font-family:'Clash Display',sans-serif;font-size:14px;font-weight:700;color:var(--mint)">78</div>
+                <div style="font-size:10px;color:var(--muted)">Productivity</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="how-inner">
+    <div class="reveal" style="text-align:center;margin-bottom:60px;">
+      <span class="section-tag">✦ Process</span>
+      <h2 class="section-title">How WellBot Works</h2>
+      <p class="section-sub" style="margin:0 auto">Get personalised wellness insights in four simple steps — no setup required.</p>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-card reveal">
+        <div class="step-num">1</div>
+        <h3>Create Account</h3>
+        <p>Sign up in seconds with your email or Google. Set your wellness goal and language preference.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">2</div>
+        <h3>Log Your Day</h3>
+        <p>Enter sleep, exercise, water intake, and other daily metrics into the wellness predictor form.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">3</div>
+        <h3>Get AI Predictions</h3>
+        <p>Our ML models analyse your data and instantly predict your mood, stress level, and productivity score.</p>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">4</div>
+        <h3>Chat & Improve</h3>
+        <p>Talk to a specialist AI, follow your personalised tips, and watch your wellness improve day by day.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPECIALISTS -->
+<section class="specialists-section" id="specialists">
+  <div class="specialists-inner">
+    <div class="reveal" style="margin-bottom:48px;">
+      <span class="section-tag">✦ Meet the Team</span>
+      <h2 class="section-title">6 AI Specialists,<br>One Platform</h2>
+      <p class="section-sub">Each specialist is powered by a unique system prompt and personality — purpose-built for their wellness domain.</p>
+    </div>
+
+    <div class="specialists-grid">
+      <a href="/login" class="specialist-card reveal">
+        <div class="spec-icon" style="background:rgba(0,229,160,0.1)">🤖</div>
+        <div class="spec-text">
+          <div class="spec-name">WellBot General</div>
+          <div class="spec-desc">Your all-round wellness assistant for any topic</div>
+        </div>
+        <span class="spec-arrow">›</span>
+      </a>
+
+      <a href="/login" class="specialist-card reveal">
+        <div class="spec-icon" style="background:rgba(79,70,229,0.1)">🧠</div>
+        <div class="spec-text">
+          <div class="spec-name">Dr. Serenity</div>
+          <div class="spec-desc">Mental health companion with CBT & mindfulness</div>
+        </div>
+        <span class="spec-arrow">›</span>
+      </a>
+
+      <a href="/login" class="specialist-card reveal">
+        <div class="spec-icon" style="background:rgba(245,158,11,0.1)">💪</div>
+        <div class="spec-text">
+          <div class="spec-name">Coach Apex</div>
+          <div class="spec-desc">Elite fitness coach for strength, cardio & HIIT</div>
+        </div>
+        <span class="spec-arrow">›</span>
+      </a>
+
+      <a href="/login" class="specialist-card reveal">
+        <div class="spec-icon" style="background:rgba(34,197,94,0.1)">🥗</div>
+        <div class="spec-text">
+          <div class="spec-name">Nouri</div>
+          <div class="spec-desc">Certified nutritionist for evidence-based meal planning</div>
+        </div>
+        <span class="spec-arrow">›</span>
+      </a>
+
+      <a href="/login" class="specialist-card reveal">
+        <div class="spec-icon" style="background:rgba(244,63,94,0.1)">🔥</div>
+        <div class="spec-text">
+          <div class="spec-name">Spark</div>
+          <div class="spec-desc">Life coach & motivational mentor to unlock potential</div>
+        </div>
+        <span class="spec-arrow">›</span>
+      </a>
+
+      <a href="/login" class="specialist-card reveal">
+        <div class="spec-icon" style="background:rgba(0,180,216,0.1)">🌿</div>
+        <div class="spec-text">
+          <div class="spec-name">Zen</div>
+          <div class="spec-desc">Stress specialist with breathwork & somatic techniques</div>
+        </div>
+        <span class="spec-arrow">›</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section">
+  <div class="testimonials-inner">
+    <div class="reveal" style="text-align:center;margin-bottom:48px;">
+      <span class="section-tag">✦ Reviews</span>
+      <h2 class="section-title">Loved by Users</h2>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <div class="tc-stars">★★★★★</div>
+        <div class="tc-quote">The ML predictor is incredible. I entered my daily stats and it predicted my stress level accurately — it even gave me personalised tips that actually helped!</div>
+        <div class="tc-author">
+          <div class="tc-avatar" style="background:linear-gradient(135deg,var(--mint),var(--teal))">P</div>
+          <div>
+            <div class="tc-name">Priya S.</div>
+            <div class="tc-role">Product Manager, Bengaluru</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal">
+        <div class="tc-stars">★★★★★</div>
+        <div class="tc-quote">Dr. Serenity helped me through a really tough week. The CBT techniques it shared were practical and the conversation felt genuinely supportive.</div>
+        <div class="tc-author">
+          <div class="tc-avatar" style="background:linear-gradient(135deg,var(--indigo),var(--teal))">R</div>
+          <div>
+            <div class="tc-name">Ravi K.</div>
+            <div class="tc-role">Student, Hyderabad</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal">
+        <div class="tc-stars">★★★★★</div>
+        <div class="tc-quote">Coach Apex gave me a HIIT plan that actually works. I've maintained a 7-day workout streak — something I've never done before. The dashboard keeps me accountable.</div>
+        <div class="tc-author">
+          <div class="tc-avatar" style="background:linear-gradient(135deg,#f59e0b,var(--rose))">A</div>
+          <div>
+            <div class="tc-name">Anjali M.</div>
+            <div class="tc-role">Fitness Enthusiast, Mumbai</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-inner reveal">
+    <div class="cta-glow"></div>
+    <h2>Start Your Wellness<br>Journey Today</h2>
+    <p>Free to use. No credit card. AI-powered wellness in seconds.</p>
+    <div class="cta-actions">
+      <a href="/login" class="btn-hero-primary" style="font-size:16px;padding:16px 36px">🌿 Create Free Account →</a>
+      <a href="/login" class="btn-hero-secondary" style="font-size:15px;padding:15px 28px">Sign In</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <div class="logo-icon" style="width:32px;height:32px;font-size:16px">🌿</div>
+      <span class="footer-copy">© 2025 WellBot. Built with 💚 for your wellness.</span>
+    </div>
+    <div class="footer-links">
+      <a href="#features">Features</a>
+      <a href="#ai">AI Engine</a>
+      <a href="#specialists">Specialists</a>
+      <a href="/login">Sign In</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── NAVBAR SCROLL ───────────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// ── MOBILE MENU ──────────────────────────────────────────────────────────────
+function openMobileMenu() { document.getElementById('mobileMenu').classList.add('open'); }
+function closeMobileMenu() { document.getElementById('mobileMenu').classList.remove('open'); }
+
+// ── SCROLL REVEAL ────────────────────────────────────────────────────────────
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// ── COUNTER ANIMATION ────────────────────────────────────────────────────────
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target.querySelector('.stat-num[data-target]');
+      if (!el) return;
+      const target = parseInt(el.dataset.target);
+      const suffix = target >= 1000 ? 'K+' : target === 99 ? '%' : target === 3 ? '' : '+';
+      const displayTarget = target >= 1000 ? target / 1000 : target;
+      let current = 0;
+      const step = displayTarget / 40;
+      const interval = setInterval(() => {
+        current += step;
+        if (current >= displayTarget) {
+          current = displayTarget;
+          clearInterval(interval);
+        }
+        el.textContent = (Number.isInteger(displayTarget) ? Math.round(current) : current.toFixed(1)) + suffix;
+      }, 30);
+      counterObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.4 });
+
+document.querySelectorAll('.stat-item').forEach(el => counterObserver.observe(el));
+
+// ── PREVIEW CHART ────────────────────────────────────────────────────────────
+const ctx = document.getElementById('previewChart');
+if (ctx) {
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [{
+        data: [3, 5, 2, 8, 4, 6, 7],
+        backgroundColor: 'rgba(0,229,160,0.2)',
+        borderColor: '#00e5a0',
+        borderWidth: 2,
+        borderRadius: 5,
+        hoverBackgroundColor: 'rgba(0,229,160,0.4)'
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#6b8a9e', font: { size: 9 } } },
+        y: { display: false, beginAtZero: true }
+      },
+      animation: { duration: 1500, easing: 'easeOutQuart' }
+    }
+  });
+}
+</script>
+</body>
+</html>

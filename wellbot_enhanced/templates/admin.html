@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WellBot — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --mint: #00e5a0;
+    --teal: #00b4d8;
+    --indigo: #6366f1;
+    --rose: #f43f5e;
+    --amber: #f59e0b;
+    --bg: #080c14;
+    --sidebar: #0a1120;
+    --card: #0d1520;
+    --card2: #111b2b;
+    --text: #e8f4f8;
+    --muted: #6b8a9e;
+    --border: rgba(255,255,255,0.07);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 100;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-mark {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--mint), var(--teal));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-name {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--mint), var(--teal));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .admin-pill {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #080c14;
+    background: var(--mint);
+    padding: 2px 7px;
+    border-radius: 100px;
+    margin-left: 2px;
+  }
+
+  .sidebar-section {
+    padding: 16px 12px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 16px;
+    margin: 2px 8px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: calc(100% - 16px);
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+  .nav-item.active { background: rgba(0,229,160,0.1); color: var(--mint); }
+  .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .admin-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--card2);
+    margin-bottom: 10px;
+  }
+
+  .admin-avatar {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--rose), var(--amber));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .admin-info { flex: 1; overflow: hidden; }
+  .admin-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+  .admin-role { font-size: 11px; color: var(--mint); }
+
+  .btn-signout {
+    display: block;
+    text-align: center;
+    padding: 9px 16px;
+    background: rgba(244,63,94,0.1);
+    border: 1px solid rgba(244,63,94,0.3);
+    border-radius: 8px;
+    color: var(--rose);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .btn-signout:hover { background: rgba(244,63,94,0.2); }
+
+  /* ── MAIN ── */
+  .main { margin-left: 260px; flex: 1; }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 64px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(8,12,20,0.9);
+    backdrop-filter: blur(16px);
+    z-index: 50;
+  }
+
+  .topbar-title {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+  .btn-back {
+    padding: 8px 14px;
+    background: rgba(0,229,160,0.08);
+    border: 1px solid rgba(0,229,160,0.25);
+    border-radius: 8px;
+    color: var(--mint);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-back:hover { background: rgba(0,229,160,0.15); }
+
+  .btn-logout {
+    padding: 8px 16px;
+    background: rgba(244,63,94,0.1);
+    border: 1px solid rgba(244,63,94,0.3);
+    border-radius: 8px;
+    color: var(--rose);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-logout:hover { background: rgba(244,63,94,0.2); }
+
+  /* ── HAMBURGER ── */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .hamburger span {
+    display: block;
+    width: 22px; height: 2px;
+    background: var(--muted);
+    border-radius: 2px;
+  }
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 99;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ── CONTENT ── */
+  .content { padding: 32px; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .greeting { margin-bottom: 28px; }
+  .greeting h1 {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .greeting p { color: var(--muted); font-size: 14px; }
+
+  /* ── STATS GRID ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .stat-card:hover { transform: translateY(-2px); border-color: rgba(0,229,160,0.2); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stat-card:nth-child(1) { animation-delay: 0.05s; }
+  .stat-card:nth-child(2) { animation-delay: 0.1s; }
+  .stat-card:nth-child(3) { animation-delay: 0.15s; }
+  .stat-card:nth-child(4) { animation-delay: 0.2s; }
+
+  .stat-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .icon-mint   { background: rgba(0,229,160,0.12); }
+  .icon-teal   { background: rgba(0,180,216,0.12); }
+  .icon-indigo { background: rgba(99,102,241,0.12); }
+  .icon-amber  { background: rgba(245,158,11,0.12); }
+  .icon-rose   { background: rgba(244,63,94,0.12); }
+
+  .stat-value {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label { font-size: 12px; color: var(--muted); }
+
+  .stat-accent {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 3px;
+    width: 40%;
+    border-radius: 0 2px 0 0;
+  }
+
+  /* ── CHARTS ── */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    animation: fadeUp 0.5s ease 0.25s both;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-family: 'Clash Display', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .card-badge {
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--card2);
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+
+  /* ── TABLE CARD ── */
+  .table-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    animation: fadeUp 0.5s ease 0.3s both;
+  }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .search-box {
+    padding: 8px 14px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 220px;
+  }
+  .search-box:focus { border-color: var(--mint); }
+  .search-box::placeholder { color: var(--muted); }
+
+  .record-count {
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--card2);
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+  thead th {
+    padding: 12px 24px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody td {
+    padding: 13px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(0,229,160,0.02); }
+
+  .user-cell { display: flex; align-items: center; gap: 10px; }
+
+  .u-avatar {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--indigo), var(--teal));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .mono { font-size: 13px; color: var(--muted); }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .badge-happy   { background: rgba(0,229,160,0.12);  color: var(--mint); }
+  .badge-neutral { background: rgba(245,158,11,0.12); color: var(--amber); }
+  .badge-sad     { background: rgba(244,63,94,0.12);  color: var(--rose); }
+  .badge-low     { background: rgba(0,229,160,0.12);  color: var(--mint); }
+  .badge-medium  { background: rgba(245,158,11,0.12); color: var(--amber); }
+  .badge-high    { background: rgba(244,63,94,0.12);  color: var(--rose); }
+
+  /* ── SCORE BAR ── */
+  .score-wrap { display: flex; align-items: center; gap: 10px; }
+  .score-bar-bg {
+    width: 80px; height: 5px;
+    background: var(--card2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .score-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--mint));
+    border-radius: 3px;
+  }
+  .score-num { font-size: 12px; color: var(--muted); }
+
+  /* ── DELETE BTN ── */
+  .btn-delete {
+    padding: 5px 12px;
+    background: rgba(244,63,94,0.08);
+    border: 1px solid rgba(244,63,94,0.25);
+    border-radius: 6px;
+    color: var(--rose);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-delete:hover { background: rgba(244,63,94,0.18); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state td {
+    text-align: center;
+    color: var(--muted);
+    padding: 48px !important;
+    font-style: italic;
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--card);
+    border: 1px solid var(--mint);
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-size: 14px;
+    color: var(--mint);
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.error { border-color: var(--rose); color: var(--rose); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1200px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .topbar { padding: 0 16px; }
+    .content { padding: 16px; }
+    .hamburger { display: flex !important; }
+    .sidebar-overlay { display: block !important; }
+    .btn-back { display: none; }
+  }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .topbar-title { font-size: 16px; }
+    .greeting h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">🌿</div>
+    <span class="logo-name">WellBot</span>
+    <span class="admin-pill">Admin</span>
+  </div>
+
+  <div class="sidebar-section">Overview</div>
+  <button class="nav-item active" onclick="showSection('dashboard', this)">
+    <span class="icon">📊</span> Dashboard
+  </button>
+
+  <div class="sidebar-section">Manage</div>
+  <button class="nav-item" onclick="showSection('users', this)">
+    <span class="icon">👥</span> Users
+  </button>
+  <button class="nav-item" onclick="showSection('dataset', this)">
+    <span class="icon">🗄️</span> Dataset
+  </button>
+  <button class="nav-item" onclick="showSection('predictions', this)">
+    <span class="icon">🤖</span> ML Predictions
+  </button>
+
+  <div class="sidebar-footer">
+    <div class="admin-card">
+      <div class="admin-avatar">⚕</div>
+      <div class="admin-info">
+        <div class="admin-name">admin@wellbot.com</div>
+        <div class="admin-role">Administrator</div>
+      </div>
+    </div>
+    <a href="/admin/logout" class="btn-signout">🚪 Sign Out</a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="topbar-title" id="topbarTitle">Admin Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <a href="/dashboard" class="btn-back">← User View</a>
+      <a href="/admin/logout" class="btn-logout">Sign Out</a>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="section active" id="section-dashboard">
+      <div class="greeting">
+        <h1>Admin Overview 👋</h1>
+        <p>Platform health and statistics at a glance</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon icon-teal">👤</div>
+          <div class="stat-value">{{ stats.total_users }}</div>
+          <div class="stat-label">Total Users</div>
+          <div class="stat-accent" style="background:linear-gradient(to right,var(--teal),var(--mint))"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-mint">💬</div>
+          <div class="stat-value">{{ stats.total_records }}</div>
+          <div class="stat-label">Wellness Records</div>
+          <div class="stat-accent" style="background:linear-gradient(to right,var(--mint),var(--teal))"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-indigo">😴</div>
+          <div class="stat-value">{{ stats.avg_sleep }}h</div>
+          <div class="stat-label">Avg Sleep Hours</div>
+          <div class="stat-accent" style="background:linear-gradient(to right,var(--indigo),var(--teal))"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-amber">⚡</div>
+          <div class="stat-value">{{ stats.avg_stress }}</div>
+          <div class="stat-label">Avg Stress Level</div>
+          <div class="stat-accent" style="background:linear-gradient(to right,var(--amber),var(--rose))"></div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="card-header">
+            <div class="card-title">Mood Distribution</div>
+            <span class="card-badge">Dataset Analysis</span>
+          </div>
+          <canvas id="moodChart" height="130"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="card-header">
+            <div class="card-title">Stress Levels</div>
+            <span class="card-badge">Dataset Analysis</span>
+          </div>
+          <canvas id="stressChart" height="130"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ USERS ══ -->
+    <div class="section" id="section-users">
+      <div class="greeting">
+        <h1>Users 👥</h1>
+        <p>Manage all registered accounts</p>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div class="card-title">All Users</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <input type="text" class="search-box" id="userSearch" placeholder="Search by email…" oninput="filterUsers()">
+            <span class="record-count">{{ users | length }} total</span>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table id="usersTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>User Email</th>
+                <th>Username</th>
+                <th>Join Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in users %}
+              <tr data-email="{{ user.email }}">
+                <td class="mono">{{ loop.index }}</td>
+                <td>
+                  <div class="user-cell">
+                    <div class="u-avatar">{{ user.email[0].upper() }}</div>
+                    <span>{{ user.email }}</span>
+                  </div>
+                </td>
+                <td class="mono">{{ user.username or '—' }}</td>
+                <td class="mono">{{ user.created_at[:10] if user.created_at else '—' }}</td>
+                <td><button class="btn-delete" onclick="deleteUser({{ user.id }}, this)">Delete</button></td>
+              </tr>
+              {% else %}
+              <tr class="empty-state"><td colspan="5">No users registered yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DATASET ══ -->
+    <div class="section" id="section-dataset">
+      <div class="greeting">
+        <h1>Dataset 🗄️</h1>
+        <p>Wellness training data preview</p>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div class="card-title">wellness_data.csv</div>
+          <span class="record-count">{{ dataset | length }} records shown</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Sleep Hours</th>
+                <th>Work Hours</th>
+                <th>Stress Level</th>
+                <th>Mood</th>
+                <th>Productivity Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in dataset %}
+              <tr>
+                <td class="mono">{{ loop.index }}</td>
+                <td class="mono">{{ row.sleep_hours }}</td>
+                <td class="mono">{{ row.work_hours }}</td>
+                <td><span class="badge badge-{{ row.stress_level }}">{{ row.stress_level | capitalize }}</span></td>
+                <td>
+                  <span class="badge badge-{{ row.mood }}">
+                    {% if row.mood == 'happy' %}😊{% elif row.mood == 'sad' %}😞{% else %}😐{% endif %}
+                    {{ row.mood | capitalize }}
+                  </span>
+                </td>
+                <td>
+                  <div class="score-wrap">
+                    <div class="score-bar-bg">
+                      <div class="score-bar-fill" style="width:{{ row.productivity_score }}%"></div>
+                    </div>
+                    <span class="score-num">{{ row.productivity_score }}</span>
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr class="empty-state"><td colspan="6">Dataset file not found.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ML PREDICTIONS ══ -->
+    <div class="section" id="section-predictions">
+      <div class="greeting">
+        <h1>ML Predictions 🤖</h1>
+        <p>Predicted wellness scores from the trained model</p>
+      </div>
+
+      <div class="chart-card" style="margin-bottom:24px">
+        <div class="card-header">
+          <div class="card-title">Predicted Productivity Score Trend</div>
+          <span class="card-badge">ML Output</span>
+        </div>
+        <canvas id="productivityChart" height="100"></canvas>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div class="card-title">Sample Predictions</div>
+          <span class="record-count">{{ predictions | length }} samples</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Sleep Hours</th>
+                <th>Work Hours</th>
+                <th>Predicted Mood</th>
+                <th>Predicted Stress</th>
+                <th>Wellness Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in predictions %}
+              <tr>
+                <td class="mono">{{ loop.index }}</td>
+                <td class="mono">{{ p.sleep_hours }}</td>
+                <td class="mono">{{ p.work_hours }}</td>
+                <td>
+                  <span class="badge badge-{{ p.mood }}">
+                    {% if p.mood == 'happy' %}😊{% elif p.mood == 'sad' %}😞{% else %}😐{% endif %}
+                    {{ p.mood | capitalize }}
+                  </span>
+                </td>
+                <td><span class="badge badge-{{ p.stress_level }}">{{ p.stress_level | capitalize }}</span></td>
+                <td>
+                  <div class="score-wrap">
+                    <div class="score-bar-bg">
+                      <div class="score-bar-fill" style="width:{{ p.productivity_score }}%"></div>
+                    </div>
+                    <span class="score-num">{{ p.productivity_score }}</span>
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr class="empty-state"><td colspan="6">No predictions available.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Section switching
+function showSection(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  btn.classList.add('active');
+  const titles = { dashboard:'Admin Dashboard', users:'Users', dataset:'Dataset', predictions:'ML Predictions' };
+  document.getElementById('topbarTitle').textContent = titles[name] || name;
+  closeSidebar();
+}
+
+// Sidebar
+function toggleSidebar() {
+  const s = document.getElementById('sidebar');
+  const o = document.getElementById('sidebarOverlay');
+  s.classList.toggle('open');
+  o.style.display = s.classList.contains('open') ? 'block' : 'none';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').style.display = 'none';
+}
+
+// Delete user
+function deleteUser(userId, btn) {
+  if (!confirm('Delete this user and all their data permanently?')) return;
+  btn.disabled = true; btn.textContent = '…';
+  fetch('/admin/delete_user/' + userId, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        const row = btn.closest('tr');
+        row.style.transition = 'opacity 0.3s';
+        row.style.opacity = '0';
+        setTimeout(() => row.remove(), 320);
+        showToast('User deleted.');
+      } else {
+        btn.disabled = false; btn.textContent = 'Delete';
+        showToast('Error: ' + data.message, true);
+      }
+    })
+    .catch(() => { btn.disabled = false; btn.textContent = 'Delete'; showToast('Network error.', true); });
+}
+
+// Search filter
+function filterUsers() {
+  const q = document.getElementById('userSearch').value.toLowerCase();
+  document.querySelectorAll('#usersTable tbody tr').forEach(row => {
+    row.style.display = (row.dataset.email || '').toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// Toast
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Charts
+const moodData = {{ mood_counts | tojson }};
+new Chart(document.getElementById('moodChart'), {
+  type: 'bar',
+  data: {
+    labels: Object.keys(moodData).map(k => k.charAt(0).toUpperCase() + k.slice(1)),
+    datasets: [{
+      data: Object.values(moodData),
+      backgroundColor: Object.keys(moodData).map(k =>
+        k==='happy' ? 'rgba(0,229,160,0.75)' : k==='sad' ? 'rgba(244,63,94,0.75)' : 'rgba(245,158,11,0.75)'
+      ),
+      borderRadius: 8, borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b8a9e' } },
+      x: { grid: { display: false }, ticks: { color: '#6b8a9e' } }
+    }
+  }
+});
+
+const stressData = {{ stress_counts | tojson }};
+new Chart(document.getElementById('stressChart'), {
+  type: 'doughnut',
+  data: {
+    labels: Object.keys(stressData).map(k => k.charAt(0).toUpperCase() + k.slice(1)),
+    datasets: [{
+      data: Object.values(stressData),
+      backgroundColor: Object.keys(stressData).map(k =>
+        k==='low' ? 'rgba(0,229,160,0.8)' : k==='high' ? 'rgba(244,63,94,0.8)' : 'rgba(245,158,11,0.8)'
+      ),
+      borderWidth: 0, hoverOffset: 8,
+    }]
+  },
+  options: {
+    responsive: true,
+    cutout: '65%',
+    plugins: { legend: { position: 'bottom', labels: { color: '#6b8a9e', padding: 16, font: { size: 12 } } } }
+  }
+});
+
+const prodScores = {{ prod_scores | tojson }};
+new Chart(document.getElementById('productivityChart'), {
+  type: 'line',
+  data: {
+    labels: prodScores.map((_, i) => 'S' + (i + 1)),
+    datasets: [{
+      label: 'Wellness Score',
+      data: prodScores,
+      borderColor: 'rgba(0,229,160,0.85)',
+      backgroundColor: 'rgba(0,229,160,0.07)',
+      borderWidth: 2,
+      pointRadius: 3,
+      pointBackgroundColor: 'rgba(0,229,160,0.9)',
+      fill: true,
+      tension: 0.4
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b8a9e' }, min: 0, max: 100 },
+      x: { grid: { display: false }, ticks: { color: '#6b8a9e', maxTicksLimit: 15 } }
+    }
+  }
+});
+</script>
+</body>
+</html>
