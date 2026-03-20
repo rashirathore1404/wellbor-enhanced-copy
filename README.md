@@ -132,3 +132,9 @@ wellbot/
 | `POST /api/language` | Update language |
 | `GET /api/export/chat/<cat>` | Export chat as text |
 | `GET /api/dashboard/stats` | JSON dashboard stats |
+
+
+WellBot AI Assistance -
+
+Rashi Rathore
+
